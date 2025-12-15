@@ -1,4 +1,5 @@
 # S86-1225-Abyss_Watchers — Full-Stack Early Flood Warning System
+
 Next.js + AWS + SafeShoreAzure | Real-Time Flood-Risk Visualization and Alerts
 
 Abyss Watchers is a full-stack early flood-warning platform designed for districts vulnerable to seasonal flooding. Using open meteorological data, the system delivers real-time visualization, predictive risk analytics, and automated alerts. It is built with Next.js on the frontend and integrates AWS services with SafeShoreAzure capabilities for cloud reliability and scalability.
@@ -57,16 +58,19 @@ Early warnings significantly reduce the loss of life and property during floodin
 
 Roadmap
 
- Geo-fenced alert zones
+Geo-fenced alert zones
 
- Offline-first PWA support
+Offline-first PWA support
 
- Multi-language interface for local communities
+Multi-language interface for local communities
 
- Historical flood pattern visualizations
+Historical flood pattern visualizations
 
- Admin dashboard for district-level control
+Admin dashboard for district-level control
 
 Contributions
 
 Contributions are welcome. Developers can assist with improving data processing pipelines, UI enhancements, predictive models, and cloud integration layers. Fork the repository, open an issue, or submit a pull request
+
+**sprint-1: local-app-running.png**
+![alt text](local-app-running.png)

@@ -87,3 +87,5 @@ Feature development and cloud integrations will be implemented in later sprints.
 Reflection
 
 Establishing a clean and well-documented project structure early helps the team collaborate effectively and reduces technical debt. This foundation will allow the application to scale smoothly as real-time data, alerts, and cloud services are added.
+
+![alt text](local-app-running.png)
