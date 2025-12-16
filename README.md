@@ -1,6 +1,4 @@
-
-
-# S86-1225-Abyss_Watchers — Full-Stack Early Flood Warning System
+## S86-1225-Abyss_Watchers — Full-Stack Early Flood Warning System
 
 Next.js + AWS + SafeShoreAzure | Real-Time Flood-Risk Visualization and Alerts
 
@@ -10,29 +8,29 @@ Project Overview
 
 Flood-prone regions need rapid access to accurate weather intelligence. Abyss Watchers provides a unified dashboard that allows residents and authorities to monitor rainfall patterns, river levels, and storm indicators, helping them prepare and respond efficiently.
 
-Key Features
+Why This Project Matters
 
-Real-time weather and river-level monitoring using open meteorological APIs
+Flood-related disasters often cause severe loss of life and property due to delayed or unclear warnings. By presenting real-time weather insights in a simple and accessible format, Abyss Watchers enables communities to take preventive action and improve disaster readiness.
 
-Interactive dashboards featuring risk maps, heatmaps, and rainfall intensity graphs
+Key Features (Planned)
 
-Automated alert system delivering SMS, email, WhatsApp, and push notifications
+Real-time rainfall and river-level monitoring using open meteorological APIs
 
-Predictive flood modeling using historical data and cloud-based ML services
+Interactive dashboards with maps, heatmaps, and rainfall intensity graphs
 
-Cloud-native architecture using AWS Lambda, EC2, S3, DynamoDB, and Azure-based processing via SafeShoreAzure
+Automated alerts via SMS, email, WhatsApp, and in-app notifications
 
-Secure and scalable full-stack design with Next.js and Node.js backend services
+Predictive flood-risk insights using historical data
 
-Tech Stack
-
+Secure and scalable full-stack architecture
+# Tech Stack
 Frontend
 
 Next.js
 
 TailwindCSS
 
-Leaflet or Mapbox for geospatial maps
+Leaflet / Mapbox
 
 Backend
 
@@ -40,121 +38,20 @@ Node.js / Express
 
 Next.js API Routes
 
-AWS Lambda for event triggers
+Cloud & Services (Planned)
 
-Azure Functions for ML inference
+AWS (S3, DynamoDB / RDS, Lambda)
 
-Cloud Infrastructure
+Azure services via SafeShoreAzure
 
-AWS S3, DynamoDB or RDS
+Notification services (SNS, SES, WhatsApp API)
 
-Azure ML and Azure Maps
+# Getting Started
+# Installation & Local Setup
+ npm install
+ npm run dev
 
-SafeShoreAzure routing and monitoring
-
-SNS, SES, and WhatsApp Cloud API for alerts
-
-Why This Project Matters
-
-Early warnings significantly reduce the loss of life and property during flooding events. By combining open data, predictive modeling, and cloud-based alerting, Abyss Watchers helps local residents and authorities make timely decisions, plan evacuations, and prepare resources in advance.
-
-Roadmap
-
-Geo-fenced alert zones
-
-Offline-first PWA support
-
-Multi-language interface for local communities
-
-Historical flood pattern visualizations
-
-Admin dashboard for district-level control
-
-Contributions
-
-Contributions are welcome. Developers can assist with improving data processing pipelines, UI enhancements, predictive models, and cloud integration layers. Fork the repository, open an issue, or submit a pull request
-=======
-HEAD
-# S86-1225-Abyss_Watchers
-
-# S86-1225-Abyss_Watchers — Full-Stack Early Flood Warning System
-984e8f4 (chore: setup TypeScript, ESLint, Prettier and Husky)
-
-## Full-Stack Early Flood Warning System
-
-**Tech Stack:** Next.js · AWS · SafeShoreAzure  
-**Focus:** Real-Time Flood-Risk Visualization and Alerts
-
----
-
-## Project Overview
-
-Abyss Watchers is a full-stack early flood-warning platform designed to support districts vulnerable to seasonal flooding. The application uses open meteorological data to provide real-time flood-risk visualization and early alerts, helping residents and authorities prepare and respond proactively.
-
----
-
-## Why This Project Matters
-
-Flood-related disasters often cause severe loss of life and property due to delayed or unclear warnings. By presenting real-time weather insights in a simple and accessible format, Abyss Watchers enables communities to take preventive action and improve disaster readiness.
-
----
-
-## Key Features (Planned)
-
-- Real-time rainfall and river-level monitoring using open meteorological APIs
-- Interactive dashboards with maps, heatmaps, and rainfall intensity graphs
-- Automated alerts via SMS, email, WhatsApp, and in-app notifications
-- Predictive flood-risk insights using historical data
-- Secure and scalable full-stack architecture
-
----
-
-## Tech Stack
-
-### Frontend
-
-- Next.js
-- TailwindCSS
-- Leaflet / Mapbox
-
-### Backend
-
-- Node.js / Express
-- Next.js API Routes
-
-### Cloud & Services (Planned)
-
-- AWS (S3, DynamoDB / RDS, Lambda)
-- Azure services via SafeShoreAzure
-- Notification services (SNS, SES, WhatsApp API)
-
----
-
-## Project Structure
-
-src/
-├── app/ # Routes, layouts, and pages using Next.js App Router
-├── components/ # Reusable UI components
-├── lib/ # Utility functions, helpers, and configurations
-
-### Structure Rationale
-
-This structure separates routing, UI components, and shared utilities, making the codebase easier to maintain and scale in future sprints as more features are added.
-
----
-
-## Getting Started
-
-### Installation & Local Setup
-
-```bash
-npm install
-npm run dev
-```
-
-Sprint-1 Focus
-
-The current sprint focuses on:
+# Sprint-1 Focus
 
 Project initialization
 
@@ -164,105 +61,32 @@ Documentation and setup clarity
 
 Feature development and cloud integrations will be implemented in later sprints.
 
-Reflection
+Reflection:
+A well-documented project structure reduces technical debt and allows smooth scaling as real-time data, alerts, and cloud services are added.
 
-Establishing a clean and well-documented project structure early helps the team collaborate effectively and reduces technical debt. This foundation will allow the application to scale smoothly as real-time data, alerts, and cloud services are added.
+Server-side only
 
-HEAD
->>>>>>> 6a0e3b1 (chore: setup TypeScript, ESLint, Prettier and Husky)
-
-**sprint-1: local-app-running.png**
-
-# S86-1225-Abyss_Watchers
-
-## Full-Stack Early Flood Warning System
-
-**Tech Stack:** Next.js · AWS · SafeShoreAzure  
-**Focus:** Real-Time Flood-Risk Visualization and Alerts
-
----
-
-## Project Overview
-
-Abyss Watchers is a full-stack early flood-warning platform designed to support districts vulnerable to seasonal flooding. The application uses open meteorological data to provide real-time flood-risk visualization and early alerts, helping residents and authorities prepare and respond proactively.
-
----
-
-## Why This Project Matters
-
-Flood-related disasters often cause severe loss of life and property due to delayed or unclear warnings. By presenting real-time weather insights in a simple and accessible format, Abyss Watchers enables communities to take preventive action and improve disaster readiness.
-
----
-
-## Key Features (Planned)
-
-- Real-time rainfall and river-level monitoring using open meteorological APIs
-- Interactive dashboards with maps, heatmaps, and rainfall intensity graphs
-- Automated alerts via SMS, email, WhatsApp, and in-app notifications
-- Predictive flood-risk insights using historical data
-- Secure and scalable full-stack architecture
-
----
-
-## Tech Stack
-
-### Frontend
-
-- Next.js
-- TailwindCSS
-- Leaflet / Mapbox
-
-### Backend
-
-- Node.js / Express
-- Next.js API Routes
-
-### Cloud & Services (Planned)
-
-- AWS (S3, DynamoDB / RDS, Lambda)
-- Azure services via SafeShoreAzure
-- Notification services (SNS, SES, WhatsApp API)
-
----
-
-## Project Structure
-
-src/
-├── app/ # Routes, layouts, and pages using Next.js App Router
-├── components/ # Reusable UI components
-├── lib/ # Utility functions, helpers, and configurations
-
-### Structure Rationale
-
-This structure separates routing, UI components, and shared utilities, making the codebase easier to maintain and scale in future sprints as more features are added.
-
----
-
-## Getting Started
-
-### Installation & Local Setup
-
-```bash
-npm install
-npm run dev
-```
-
-Sprint-1 Focus
-
-The current sprint focuses on:
-
-Project initialization
-
-Clean folder structure
-
-Documentation and setup clarity
-
-Feature development and cloud integrations will be implemented in later sprints.
-
-Reflection
-
-Establishing a clean and well-documented project structure early helps the team collaborate effectively and reduces technical debt. This foundation will allow the application to scale smoothly as real-time data, alerts, and cloud services are added.
+// pages/api/db-test.js
+export default function handler(req, res) {
+  const dbUrl = process.env.DATABASE_URL; // server-only
+  res.status(200).json({ dbUrl });
+}
 
 
-984e8f4 (chore: setup TypeScript, ESLint, Prettier and Husky)
-![alt text](local-app-running.png)
+Client-side safe
+
+// components/ApiComponent.js
+import { useEffect, useState } from "react";
+
+export default function ApiComponent() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/data`)
+      .then(res => res.json())
+      .then(data => setData(data));
+  }, []);
+
+  return <div>{JSON.stringify(data)}</div>;
+}
+
