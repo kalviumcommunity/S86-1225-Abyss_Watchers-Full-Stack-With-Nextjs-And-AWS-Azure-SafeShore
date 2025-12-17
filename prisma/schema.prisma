@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  role      Role
+  createdAt DateTime  @default(now())
+
+  appointments Appointment[]
+}
+
+model Doctor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  specialty String
+  roomNo    String
+
+  queues    Queue[]
+}
+
+model Queue {
+  id          Int      @id @default(autoincrement())
+  doctorId    Int
+  date        DateTime
+  currentNo   Int      @default(0)
+
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  tokenNo   Int
+  status    Status   @default(PENDING)
+  userId    Int
+  queueId   Int
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  queue     Queue    @relation(fields: [queueId], references: [id], onDelete: Cascade)
+
+  @@unique([queueId, tokenNo])
+}
+
+enum Role {
+  PATIENT
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
