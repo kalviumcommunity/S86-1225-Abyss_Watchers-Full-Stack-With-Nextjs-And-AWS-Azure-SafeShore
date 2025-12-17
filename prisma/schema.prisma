@@ -7,17 +7,19 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  role      Role
-  createdAt DateTime  @default(now())
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  role         Role
+  createdAt    DateTime      @default(now())
 
   appointments Appointment[]
+
+  @@index([email])
 }
 
 model Doctor {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   specialty String
   roomNo    String
@@ -26,26 +28,31 @@ model Doctor {
 }
 
 model Queue {
-  id          Int      @id @default(autoincrement())
-  doctorId    Int
-  date        DateTime
-  currentNo   Int      @default(0)
+  id        Int      @id @default(autoincrement())
+  doctorId  Int
+  date      DateTime
+  currentNo Int      @default(0)
 
-  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor       Doctor        @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+
+  @@index([doctorId])
+  @@index([date])
 }
 
 model Appointment {
-  id        Int      @id @default(autoincrement())
-  tokenNo   Int
-  status    Status   @default(PENDING)
-  userId    Int
-  queueId   Int
+  id      Int     @id @default(autoincrement())
+  tokenNo Int
+  status  Status @default(PENDING)
+  userId  Int
+  queueId Int
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  queue     Queue    @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  queue Queue @relation(fields: [queueId], references: [id], onDelete: Cascade)
 
   @@unique([queueId, tokenNo])
+  @@index([userId])
+  @@index([queueId])
 }
 
 enum Role {
