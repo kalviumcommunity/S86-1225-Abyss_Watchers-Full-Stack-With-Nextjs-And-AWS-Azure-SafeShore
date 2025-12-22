@@ -8,7 +8,7 @@ curl -s "$BASE/api/users" | jq
 echo "POST /api/users"
 user_json=$(curl -s -X POST "$BASE/api/users" -H 'Content-Type: application/json' -d '{"name":"Test User","email":"test@example.com","role":"PATIENT"}')
 echo "$user_json" | jq
-user_id=$(echo "$user_json" | jq -r '.id')
+user_id=$(echo "$user_json" | jq -r '.data.id')
 
 echo "GET /api/users?page=1&limit=5"
 curl -s "$BASE/api/users?page=1&limit=5" | jq
@@ -30,7 +30,7 @@ fi
 echo "POST /api/queues"
 queue_json=$(curl -s -X POST "$BASE/api/queues" -H 'Content-Type: application/json' -d '{"doctorId":1,"date":"2025-12-31T09:00:00Z"}')
 echo "$queue_json" | jq
-queue_id=$(echo "$queue_json" | jq -r '.id')
+queue_id=$(echo "$queue_json" | jq -r '.data.id')
 
 echo "GET /api/queues"
 curl -s "$BASE/api/queues" | jq
@@ -60,7 +60,7 @@ else
 fi
 
 echo "$appt_json" | jq
-appt_id=$(echo "$appt_json" | jq -r '.id')
+appt_id=$(echo "$appt_json" | jq -r '.data.id')
 
 echo "GET /api/appointments"
 curl -s "$BASE/api/appointments" | jq

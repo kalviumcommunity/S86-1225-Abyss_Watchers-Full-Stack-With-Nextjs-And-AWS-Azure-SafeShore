@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(
   _req: Request,
@@ -8,18 +8,14 @@ export async function GET(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const user = await prisma.user.findUnique({ where: { id } });
-    if (!user)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(user);
+    if (!user) return sendError("Not found", "NOT_FOUND", 404);
+    return sendSuccess(user, "User fetched successfully");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch user" },
-      { status: 500 }
-    );
+    return sendError("Failed to fetch user", "DATABASE_FAILURE", 500, err);
   }
 }
 
@@ -30,7 +26,7 @@ export async function PUT(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const payload = await req.json();
     const { name, email, role } = payload;
@@ -39,13 +35,10 @@ export async function PUT(
       where: { id },
       data: { name, email, role },
     });
-    return NextResponse.json(user);
+    return sendSuccess(user, "User updated successfully");
   } catch (err: unknown) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to update user" },
-      { status: 500 }
-    );
+    return sendError("Failed to update user", "DATABASE_FAILURE", 500, err);
   }
 }
 
@@ -56,15 +49,12 @@ export async function DELETE(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     await prisma.user.delete({ where: { id } });
-    return NextResponse.json({ message: "Deleted" });
+    return sendSuccess(null, "Deleted");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to delete user" },
-      { status: 500 }
-    );
+    return sendError("Failed to delete user", "DATABASE_FAILURE", 500, err);
   }
 }

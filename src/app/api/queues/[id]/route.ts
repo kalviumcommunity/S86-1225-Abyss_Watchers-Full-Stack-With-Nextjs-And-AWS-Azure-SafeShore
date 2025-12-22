@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(
   _req: Request,
@@ -8,18 +8,14 @@ export async function GET(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const queue = await prisma.queue.findUnique({ where: { id } });
-    if (!queue)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(queue);
+    if (!queue) return sendError("Not found", "NOT_FOUND", 404);
+    return sendSuccess(queue, "Queue fetched");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch queue" },
-      { status: 500 }
-    );
+    return sendError("Failed to fetch queue", "DATABASE_FAILURE", 500, err);
   }
 }
 
@@ -30,7 +26,7 @@ export async function PUT(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const payload = await req.json();
     const { currentNo, date, doctorId } = payload;
@@ -39,13 +35,10 @@ export async function PUT(
       where: { id },
       data: { currentNo, date: date ? new Date(date) : undefined, doctorId },
     });
-    return NextResponse.json(queue);
+    return sendSuccess(queue, "Queue updated");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to update queue" },
-      { status: 500 }
-    );
+    return sendError("Failed to update queue", "DATABASE_FAILURE", 500, err);
   }
 }
 
@@ -56,15 +49,12 @@ export async function DELETE(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     await prisma.queue.delete({ where: { id } });
-    return NextResponse.json({ message: "Deleted" });
+    return sendSuccess(null, "Deleted");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to delete queue" },
-      { status: 500 }
-    );
+    return sendError("Failed to delete queue", "DATABASE_FAILURE", 500, err);
   }
 }

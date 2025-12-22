@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(req: Request) {
   try {
@@ -13,13 +13,14 @@ export async function GET(req: Request) {
       prisma.queue.count(),
     ]);
 
-    return NextResponse.json({ page, limit, total, data });
+    return sendSuccess(
+      { page, limit, total, items: data },
+      "Queues fetched",
+      200
+    );
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch queues" },
-      { status: 500 }
-    );
+    return sendError("Failed to fetch queues", "DATABASE_FAILURE", 500, err);
   }
 }
 
@@ -28,20 +29,14 @@ export async function POST(req: Request) {
     const payload = await req.json();
     const { doctorId, date } = payload;
     if (!doctorId || !date)
-      return NextResponse.json(
-        { error: "doctorId and date required" },
-        { status: 400 }
-      );
+      return sendError("doctorId and date required", "VALIDATION_ERROR", 400);
 
     const queue = await prisma.queue.create({
       data: { doctorId, date: new Date(date) },
     });
-    return NextResponse.json(queue, { status: 201 });
+    return sendSuccess(queue, "Queue created", 201);
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to create queue" },
-      { status: 500 }
-    );
+    return sendError("Failed to create queue", "DATABASE_FAILURE", 500, err);
   }
 }
