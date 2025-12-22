@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(
   _req: Request,
@@ -8,17 +8,18 @@ export async function GET(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const appointment = await prisma.appointment.findUnique({ where: { id } });
-    if (!appointment)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(appointment);
+    if (!appointment) return sendError("Not found", "NOT_FOUND", 404);
+    return sendSuccess(appointment, "Appointment fetched");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch appointment" },
-      { status: 500 }
+    return sendError(
+      "Failed to fetch appointment",
+      "DATABASE_FAILURE",
+      500,
+      err
     );
   }
 }
@@ -30,7 +31,7 @@ export async function PUT(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     const payload = await req.json();
     const { tokenNo, status } = payload;
@@ -39,12 +40,14 @@ export async function PUT(
       where: { id },
       data: { tokenNo, status },
     });
-    return NextResponse.json(appointment);
+    return sendSuccess(appointment, "Appointment updated");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to update appointment" },
-      { status: 500 }
+    return sendError(
+      "Failed to update appointment",
+      "DATABASE_FAILURE",
+      500,
+      err
     );
   }
 }
@@ -56,15 +59,17 @@ export async function DELETE(
   try {
     const id = Number(params.id);
     if (Number.isNaN(id))
-      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+      return sendError("Invalid id", "VALIDATION_ERROR", 400);
 
     await prisma.appointment.delete({ where: { id } });
-    return NextResponse.json({ message: "Deleted" });
+    return sendSuccess(null, "Deleted");
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to delete appointment" },
-      { status: 500 }
+    return sendError(
+      "Failed to delete appointment",
+      "DATABASE_FAILURE",
+      500,
+      err
     );
   }
 }

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
 
 export async function GET(req: Request) {
   try {
@@ -17,12 +17,18 @@ export async function GET(req: Request) {
       prisma.appointment.count(),
     ]);
 
-    return NextResponse.json({ page, limit, total, data });
+    return sendSuccess(
+      { page, limit, total, items: data },
+      "Appointments fetched",
+      200
+    );
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch appointments" },
-      { status: 500 }
+    return sendError(
+      "Failed to fetch appointments",
+      "DATABASE_FAILURE",
+      500,
+      err
     );
   }
 }
@@ -32,20 +38,23 @@ export async function POST(req: Request) {
     const payload = await req.json();
     const { tokenNo, userId, queueId, status } = payload;
     if (typeof tokenNo !== "number" || !userId || !queueId)
-      return NextResponse.json(
-        { error: "tokenNo, userId and queueId are required" },
-        { status: 400 }
+      return sendError(
+        "tokenNo, userId and queueId are required",
+        "VALIDATION_ERROR",
+        400
       );
 
     const appointment = await prisma.appointment.create({
       data: { tokenNo, userId, queueId, status },
     });
-    return NextResponse.json(appointment, { status: 201 });
+    return sendSuccess(appointment, "Appointment created", 201);
   } catch (err: unknown) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to create appointment" },
-      { status: 500 }
+    return sendError(
+      "Failed to create appointment",
+      "DATABASE_FAILURE",
+      500,
+      err
     );
   }
 }

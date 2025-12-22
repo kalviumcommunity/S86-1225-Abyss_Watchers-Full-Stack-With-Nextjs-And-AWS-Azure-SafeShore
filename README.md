@@ -238,7 +238,40 @@ Example: `GET /api/users?page=2&limit=25`
 - `404` — Resource not found
 - `500` — Internal server error (unexpected)
 
-Handlers return JSON `{ error: 'message' }` on failures. Check logs for server-side details.
+Handlers return a **unified response envelope** so every endpoint has a consistent shape for success and error responses. This makes frontends and monitoring tooling simpler and more robust.
+
+#### Unified response envelope
+
+Success example:
+
+```json
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": { "id": 12, "name": "Charlie" },
+  "timestamp": "2025-10-30T10:00:00Z"
+}
+```
+
+Error example:
+
+```json
+{
+  "success": false,
+  "message": "Missing required field: name",
+  "error": { "code": "E001", "details": null },
+  "timestamp": "2025-10-30T10:00:00Z"
+}
+```
+
+#### Error codes
+
+- `VALIDATION_ERROR` — `E001`
+- `NOT_FOUND` — `E002`
+- `DATABASE_FAILURE` — `E003`
+- `INTERNAL_ERROR` — `E500`
+
+> Note: The test scripts and Postman collection were updated to account for the unified envelope; created resource IDs are available at `response.data.id`.
 
 ### Example curl requests
 

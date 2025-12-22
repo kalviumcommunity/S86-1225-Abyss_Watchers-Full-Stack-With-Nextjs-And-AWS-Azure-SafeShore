@@ -6,7 +6,7 @@ Invoke-RestMethod -Uri "$Base/api/users" -Method Get | ConvertTo-Json -Depth 4
 Write-Output "POST /api/users"
 $user = Invoke-RestMethod -Uri "$Base/api/users" -Method Post -Body (@{name='Test User'; email='test@example.com'; role='PATIENT'} | ConvertTo-Json) -ContentType 'application/json'
 $user | ConvertTo-Json -Depth 4
-$userId = $user.id
+$userId = $user.data.id
 
 if ($null -ne $userId) {
     Write-Output "GET /api/users/$userId"
@@ -23,7 +23,7 @@ if ($null -ne $userId) {
 Write-Output "POST /api/queues"
 $queue = Invoke-RestMethod -Uri "$Base/api/queues" -Method Post -Body (@{doctorId=1; date='2025-12-31T09:00:00Z'} | ConvertTo-Json) -ContentType 'application/json'
 $queue | ConvertTo-Json -Depth 4
-$queueId = $queue.id
+$queueId = $queue.data.id
 
 if ($null -ne $queueId) {
     Write-Output "GET /api/queues/$queueId"
@@ -45,7 +45,7 @@ if (-not $userId -or -not $queueId) {
     $appt = Invoke-RestMethod -Uri "$Base/api/appointments" -Method Post -Body (@{tokenNo=1; userId=$userId; queueId=$queueId; status='PENDING'} | ConvertTo-Json) -ContentType 'application/json'
 }
 $appt | ConvertTo-Json -Depth 4
-$apptId = $appt.id
+$apptId = $appt.data.id
 
 if ($null -ne $apptId) {
     Write-Output "GET /api/appointments/$apptId"
