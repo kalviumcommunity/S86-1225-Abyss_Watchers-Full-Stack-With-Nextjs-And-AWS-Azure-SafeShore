@@ -90,3 +90,54 @@ export default function ApiComponent() {
   return <div>{JSON.stringify(data)}</div>;
 }
 
+---
+
+## Database Migrations & Seeding (Prisma) 🔧
+
+This project uses Prisma Migrate to version the database schema and a reproducible seed script to populate initial data.
+
+### Workflow
+
+1. Create & apply a new migration locally:
+
+   ```bash
+   npx prisma migrate dev --name init_schema
+   ```
+
+2. Reset the database (use with caution — resets all data):
+
+   ```bash
+   npx prisma migrate reset
+   ```
+
+3. Run the seed script (wired into package.json):
+
+   ```bash
+   npx prisma db seed
+   ```
+
+### Seed script details
+
+- The seed file is at `prisma/seed.ts` and is written to be **idempotent**: it uses `upsert` or existence checks so re-running the seed will not create duplicate entities.
+- The seed covers sample `User`, `Doctor`, `Queue`, and `Appointment` records to make local testing straightforward.
+
+### Rollbacks & Production safety
+
+- Test every migration on staging before applying in production.
+- Keep frequent backups of production databases and use backup restore testing to verify restore points.
+- Use `prisma migrate reset` only on development/staging environments, never directly in production.
+
+### Example output (local)
+
+```
+$ npx prisma migrate dev --name add_some_changes
+✔ Generated migration SQL
+✔ Applied migration to database
+
+$ npx prisma db seed
+✅ Seed data inserted/updated successfully
+```
+
+If you want me to run these commands locally and capture logs, tell me which environment (local Postgres connection string) to use and I'll run them and paste the outputs here.
+
+
