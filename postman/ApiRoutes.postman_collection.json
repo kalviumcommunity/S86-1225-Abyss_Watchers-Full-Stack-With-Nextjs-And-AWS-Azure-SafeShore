@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "SafeShore API Routes",
+    "_postman_id": "00000000-0000-0000-0000-000000000000",
+    "description": "Collection for Users, Queues, and Appointments endpoints (full CRUD)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get users",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/users"
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Alice\",\"email\":\"alice@example.com\",\"role\":\"PATIENT\"}"
+            },
+            "url": "http://localhost:3000/api/users"
+          }
+        },
+        {
+          "name": "Get user by id",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/users/1"
+          }
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Updated Alice\"}" },
+            "url": "http://localhost:3000/api/users/1"
+          }
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:3000/api/users/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Queues",
+      "item": [
+        {
+          "name": "Get queues",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/queues"
+          }
+        },
+        {
+          "name": "Create queue",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"doctorId\":1,\"date\":\"2025-12-31T09:00:00Z\"}"
+            },
+            "url": "http://localhost:3000/api/queues"
+          }
+        },
+        {
+          "name": "Get queue by id",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/queues/1"
+          }
+        },
+        {
+          "name": "Update queue",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"currentNo\":2}" },
+            "url": "http://localhost:3000/api/queues/1"
+          }
+        },
+        {
+          "name": "Delete queue",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:3000/api/queues/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Get appointments",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/appointments"
+          }
+        },
+        {
+          "name": "Create appointment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tokenNo\":1,\"userId\":1,\"queueId\":1,\"status\":\"PENDING\"}"
+            },
+            "url": "http://localhost:3000/api/appointments"
+          }
+        },
+        {
+          "name": "Get appointment by id",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3000/api/appointments/1"
+          }
+        },
+        {
+          "name": "Update appointment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"COMPLETED\"}" },
+            "url": "http://localhost:3000/api/appointments/1"
+          }
+        },
+        {
+          "name": "Delete appointment",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:3000/api/appointments/1"
+          }
+        }
+      ]
+    }
+  ]
+}

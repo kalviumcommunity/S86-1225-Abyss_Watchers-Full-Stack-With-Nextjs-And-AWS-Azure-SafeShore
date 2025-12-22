@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "db:seed": "prisma db seed",
     "transaction:demo": "node scripts/transaction-demo.cjs",
+    "api:test": "bash scripts/api-tests.sh",
+    "api:test:ps1": "powershell -ExecutionPolicy ByPass -File ./scripts/api-tests.ps1",
     "prepare": "husky install"
   },
   "lint-staged": {
