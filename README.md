@@ -197,3 +197,111 @@ If you'd like, I can also:
 - Convert `prisma/seed.ts` into a CI-run compiled seed to avoid runtime ts-node quirks.
 
 **Commit:** Transaction & Query Optimisation — committed.
+
+---
+
+## API Routes (app/api) 🔧
+
+This project follows file-based routing from Next.js app router. The following endpoints were added to provide predictable, RESTful access to core resources: Users, Queues, and Appointments.
+
+### Route hierarchy
+
+- `GET /api/users` — list users (pagination via `?page=` & `?limit=`)
+- `POST /api/users` — create a user
+- `GET /api/users/:id` — get single user
+- `PUT /api/users/:id` — update user
+- `DELETE /api/users/:id` — delete user
+
+- `GET /api/queues` — list queues (pagination)
+- `POST /api/queues` — create queue
+- `GET /api/queues/:id` — get single queue
+- `PUT /api/queues/:id` — update queue
+- `DELETE /api/queues/:id` — delete queue
+
+- `GET /api/appointments` — list appointments (pagination)
+- `POST /api/appointments` — create appointment
+- `GET /api/appointments/:id` — get single appointment
+- `PUT /api/appointments/:id` — update appointment
+- `DELETE /api/appointments/:id` — delete appointment
+
+### Pagination & Filtering
+
+List endpoints support `page` and `limit` query parameters. `limit` is capped at 100 by default.
+
+Example: `GET /api/users?page=2&limit=25`
+
+### Status Codes & Error Handling
+
+- `200` — OK
+- `201` — Created
+- `400` — Bad request (validation)
+- `404` — Resource not found
+- `500` — Internal server error (unexpected)
+
+Handlers return JSON `{ error: 'message' }` on failures. Check logs for server-side details.
+
+### Example curl requests
+
+```bash
+# List users
+curl -s http://localhost:3000/api/users
+
+# Create a user
+curl -s -X POST http://localhost:3000/api/users -H "Content-Type: application/json" -d '{"name":"Charlie","email":"charlie@example.com","role":"PATIENT"}'
+
+# Update a user
+curl -s -X PUT http://localhost:3000/api/users/1 -H "Content-Type: application/json" -d '{"name":"Updated Name"}'
+```
+
+### Sample responses (examples)
+
+- Create (201):
+
+```json
+{
+  "id": 6,
+  "name": "Charlie",
+  "email": "charlie@example.com",
+  "role": "PATIENT"
+}
+```
+
+- Not found (404):
+
+```json
+{ "error": "Not found" }
+```
+
+- Validation error (400):
+
+```json
+{ "error": "name and email are required" }
+```
+
+### Running tests and Postman
+
+- Run curl-based tests (bash):
+
+```bash
+./scripts/api-tests.sh
+```
+
+- Run PowerShell tests (Windows PowerShell):
+
+```powershell
+./scripts/api-tests.ps1
+```
+
+- Import `postman/ApiRoutes.postman_collection.json` into Postman to run the saved collection (includes full CRUD for users, queues, and appointments).
+
+### Test scripts & Postman
+
+- `scripts/api-tests.sh` — bash script with curl tests (requires `jq` for pretty output).
+- `scripts/api-tests.ps1` — PowerShell test script.
+- `postman/ApiRoutes.postman_collection.json` — Postman collection to import.
+
+### Reflection
+
+Consistent, resource-based naming makes endpoints predictable and easier to integrate with. The handlers include pagination and clear error semantics so clients can handle responses uniformly.
+
+---
