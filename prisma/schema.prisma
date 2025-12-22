@@ -16,6 +16,8 @@ model User {
   appointments Appointment[]
 
   @@index([email])
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Doctor {
@@ -53,6 +55,7 @@ model Appointment {
   @@unique([queueId, tokenNo])
   @@index([userId])
   @@index([queueId])
+  @@index([status])
 }
 
 enum Role {

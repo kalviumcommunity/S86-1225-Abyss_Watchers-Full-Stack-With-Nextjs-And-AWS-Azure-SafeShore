@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 require("dotenv").config();
 const { Pool } = require("pg");
 // Normalize DATABASE_URL: strip surrounding quotes if present
