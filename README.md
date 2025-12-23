@@ -527,6 +527,35 @@ Recommendations:
 - Send logs to a centralized logger (CloudWatch, Datadog) for production. Replace `lib/logger.ts` with `pino`/`winston` adapter when scaling.
 - Extend `handleError` to map custom error types (e.g., validation or auth errors) to specific HTTP statuses and error codes.
 
+## Redis Caching (Cache-Aside)
+
+We added a simple Redis cache helper at `lib/redis.ts` using `ioredis`. The `GET /api/users` endpoint uses a cache-aside strategy:
+
+- Cache key: `users:list`
+- TTL: 60 seconds (set via `redis.set(..., 'EX', 60)`).
+- On `GET /api/users`, the route checks Redis first; on miss it queries the DB, caches the result, and returns it.
+- On user create/update (signup or `PUT /api/users/:id`) the route invalidates `users:list` using `redis.del()` to avoid stale data.
+
+Example `lib/redis.ts`:
+
+```ts
+import Redis from 'ioredis'
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+export default redis
+```
+
+Example behavior:
+
+- Cold request: cache miss -> DB read -> cache set -> return (source: `db`).
+- Subsequent request within TTL: cache hit -> return (source: `cache`).
+
+Notes & tradeoffs:
+
+- TTL choice depends on how fresh data must be; 60s is an example.
+- For stronger consistency, update cache directly after DB writes instead of deleting.
+- Use namespaced keys or include query params in keys when caching filtered/paginated results.
+
+
 
 
 
