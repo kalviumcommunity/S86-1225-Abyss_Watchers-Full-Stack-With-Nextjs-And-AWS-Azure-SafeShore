@@ -604,6 +604,41 @@ Notes:
 - Ensure your Prisma schema includes a `File` model to persist file records; adapt fields used in `app/api/files/route.ts` accordingly.
 - For Azure Blob, use `@azure/storage-blob` and generate SAS tokens similarly.
 
+## Email Service Integration (SES / SendGrid)
+
+The project supports transactional emails via AWS SES or SendGrid. Choose provider by setting `EMAIL_PROVIDER=ses` or `EMAIL_PROVIDER=sendgrid`.
+
+Environment variables (SES):
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `SES_EMAIL_SENDER` (verified sender address)
+
+Environment variables (SendGrid):
+
+- `SENDGRID_API_KEY`
+- `SENDGRID_SENDER` (verified sender)
+
+Endpoint: `POST /api/email` with body `{ to, subject, message, template?, templateVars? }`.
+
+Example (SendGrid):
+
+```bash
+curl -X POST http://localhost:3000/api/email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"user@example.com","subject":"Welcome!","template":"welcome","templateVars":{"name":"Alice"}}'
+```
+
+The route returns `{ success: true }` on success and logs message IDs for SES.
+
+Notes:
+
+- SES requires verified sender emails in sandbox mode; move to production and verify domain for higher throughput.
+- Handle rate limits with background queues for high volume.
+- Store event logs or use provider webhooks for bounces and delivery notifications.
+
+
 
 
 
