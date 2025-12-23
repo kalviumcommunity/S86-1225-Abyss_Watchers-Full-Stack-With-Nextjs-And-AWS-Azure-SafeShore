@@ -338,3 +338,60 @@ curl -s -X PUT http://localhost:3000/api/users/1 -H "Content-Type: application/j
 Consistent, resource-based naming makes endpoints predictable and easier to integrate with. The handlers include pagination and clear error semantics so clients can handle responses uniformly.
 
 ---
+
+## Input Validation with Zod
+
+We validate all `POST` and `PUT` requests using Zod schemas located in `lib/schemas/`.
+
+- **Schemas:**
+  - `lib/schemas/userSchema.ts` — `userSchema` and `UserInput`
+  - `lib/schemas/queueSchema.ts` — `queueSchema` and `QueueInput`
+  - `lib/schemas/appointmentSchema.ts` — `appointmentSchema` and `AppointmentInput`
+
+Each API handler uses the corresponding schema to `parse()` incoming JSON. Validation errors are returned as a structured 400 response:
+
+```json
+{
+  "success": false,
+  "message": "Validation Error",
+  "errors": [ { "field": "name", "message": "Name must be at least 2 characters long" } ]
+}
+```
+
+Passing example (curl):
+
+```bash
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","email":"alice@example.com","age":22}'
+```
+
+Failing example (curl):
+
+```bash
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"A","email":"bademail"}'
+```
+
+Expected failing response:
+
+```json
+{
+  "success": false,
+  "message": "Validation Error",
+  "errors": [
+    { "field": "name", "message": "Name must be at least 2 characters long" },
+    { "field": "email", "message": "Invalid email address" }
+  ]
+}
+```
+
+Why reuse schemas?
+
+- Keeps frontend and backend validation consistent.
+- Reduces duplication and drift when requirements change.
+- Enables TypeScript `z.infer<>` types for safe client models.
+
+See the schema files for exact rules and examples.
+
