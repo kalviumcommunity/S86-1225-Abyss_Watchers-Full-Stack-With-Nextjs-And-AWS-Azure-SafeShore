@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { handleError } from "@/lib/errorHandler";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
@@ -21,6 +22,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, message: "Login successful", token }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ success: false, message: "Login failed", error: String(error) }, { status: 500 });
+    return handleError(error, "POST /api/auth/login");
   }
 }
