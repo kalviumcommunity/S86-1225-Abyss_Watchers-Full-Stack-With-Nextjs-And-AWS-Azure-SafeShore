@@ -432,4 +432,41 @@ Notes & recommendations:
 - Consider using `httpOnly` secure cookies for tokens instead of localStorage for better protection against XSS.
 - For long-lived sessions, implement a refresh-token flow.
 
+## Authorization Middleware (RBAC)
+
+This project includes `app/middleware.ts` which validates incoming JWTs and enforces role-based rules for protected routes:
+
+- Protects: `/api/admin` (admin-only) and `/api/users` (authenticated users)
+- Verifies JWT and returns `401` if missing or `403` if invalid/expired
+- For `/api/admin`, middleware checks `decoded.role === 'admin'` and returns `403` on denial
+- Attaches `x-user-email` and `x-user-role` headers to forwarded requests for downstream handlers
+
+Example admin access (allowed):
+
+```bash
+curl -X GET http://localhost:3000/api/admin \
+  -H "Authorization: Bearer <ADMIN_JWT>"
+```
+
+Example admin access (denied for non-admin):
+
+```bash
+curl -X GET http://localhost:3000/api/admin \
+  -H "Authorization: Bearer <USER_JWT>"
+```
+
+Example protected users route (authenticated):
+
+```bash
+curl -X GET http://localhost:3000/api/users \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+Notes & design decisions:
+
+- Middleware uses `jsonwebtoken` and expects the `role` to be present in the JWT payload (the login route includes `role` in the token).
+- The middleware sets request headers for downstream access — you can also attach a request-scoped context/store if preferred.
+- To add more roles, extend the role checks in `app/middleware.ts` or centralize permission rules in a small RBAC module.
+
+
 
