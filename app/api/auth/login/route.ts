@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
 
     return NextResponse.json({ success: true, message: "Login successful", token }, { status: 200 });
   } catch (error) {
