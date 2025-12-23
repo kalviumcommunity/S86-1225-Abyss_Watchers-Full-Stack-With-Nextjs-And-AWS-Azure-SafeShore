@@ -395,3 +395,41 @@ Why reuse schemas?
 
 See the schema files for exact rules and examples.
 
+## Authentication (Signup / Login)
+
+This project includes simple `signup` and `login` API endpoints using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance.
+
+- `POST /api/auth/signup` — create an account (stores hashed password)
+- `POST /api/auth/login` — exchange credentials for a JWT
+- `GET /api/users` — example protected route that requires `Authorization: Bearer <token>`
+
+Example signup request:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","email":"alice@example.com","password":"mypassword"}'
+```
+
+Example login request:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@example.com","password":"mypassword"}'
+```
+
+Example protected request (replace <TOKEN>):
+
+```bash
+curl -X GET http://localhost:3000/api/users \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+Notes & recommendations:
+
+- Store `JWT_SECRET` in environment variables in production.
+- Consider using `httpOnly` secure cookies for tokens instead of localStorage for better protection against XSS.
+- For long-lived sessions, implement a refresh-token flow.
+
+
