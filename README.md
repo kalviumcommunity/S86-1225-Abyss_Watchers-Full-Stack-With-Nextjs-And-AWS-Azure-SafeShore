@@ -468,5 +468,65 @@ Notes & design decisions:
 - The middleware sets request headers for downstream access — you can also attach a request-scoped context/store if preferred.
 - To add more roles, extend the role checks in `app/middleware.ts` or centralize permission rules in a small RBAC module.
 
+## Centralized Error Handling
+
+We added `lib/logger.ts` and `lib/errorHandler.ts` to provide structured logging and consistent, safe error responses.
+
+- `lib/logger.ts` — lightweight structured logger (JSON output) with `info` and `error` helpers.
+- `lib/errorHandler.ts` — `handleError(error, context, status?)` logs the error and returns a safe JSON response.
+
+Behavior:
+
+- Development (`NODE_ENV !== 'production'`): responses include the original error message and `stack`.
+- Production (`NODE_ENV === 'production'`): responses return a generic message: `Something went wrong. Please try again later.` and `stack` is redacted in logs.
+
+Example usage in routes:
+
+```ts
+import { handleError } from '@/lib/errorHandler'
+
+try {
+  // ... route logic
+} catch (err) {
+  return handleError(err, 'GET /api/users')
+}
+```
+
+Example dev response (detailed):
+
+```json
+{
+  "success": false,
+  "message": "Database connection failed!",
+  "stack": "Error: Database connection failed! at ..."
+}
+```
+
+Example prod response (safe):
+
+```json
+{
+  "success": false,
+  "message": "Something went wrong. Please try again later."
+}
+```
+
+Structured log example (console):
+
+```json
+{
+  "level":"error",
+  "message":"Error in GET /api/users",
+  "meta":{ "message":"Database connection failed!","stack":"REDACTED" },
+  "timestamp":"2025-10-29T16:45:00.000Z"
+}
+```
+
+Recommendations:
+
+- Send logs to a centralized logger (CloudWatch, Datadog) for production. Replace `lib/logger.ts` with `pino`/`winston` adapter when scaling.
+- Extend `handleError` to map custom error types (e.g., validation or auth errors) to specific HTTP statuses and error codes.
+
+
 
 

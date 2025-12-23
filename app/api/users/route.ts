@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { userSchema } from "@/lib/schemas/userSchema";
 import { ZodError } from "zod";
 import jwt from "jsonwebtoken";
+import { handleError } from "@/lib/errorHandler";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
     const decoded = jwt.verify(token, JWT_SECRET);
     return NextResponse.json({ success: true, message: "Protected data", user: decoded }, { status: 200 });
   } catch (e) {
-    return NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 403 });
+    return handleError(e, "GET /api/users", 403);
   }
 }
 
@@ -35,6 +36,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    return NextResponse.json({ success: false, message: "Unexpected error" }, { status: 500 });
+    return handleError(error, "POST /api/users");
   }
 }
