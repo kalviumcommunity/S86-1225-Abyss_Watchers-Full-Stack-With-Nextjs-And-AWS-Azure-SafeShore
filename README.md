@@ -555,6 +555,55 @@ Notes & tradeoffs:
 - For stronger consistency, update cache directly after DB writes instead of deleting.
 - Use namespaced keys or include query params in keys when caching filtered/paginated results.
 
+## File Uploads (Pre-signed URLs)
+
+This project includes an example AWS S3 pre-signed URL flow. The upload generator is at `app/api/upload/route.ts` and the metadata persistence endpoint is `app/api/files/route.ts`.
+
+Environment variables required for AWS S3:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `AWS_BUCKET_NAME`
+
+Example request to obtain a pre-signed URL (server validates file type):
+
+```bash
+curl -X POST http://localhost:3000/api/upload \
+  -H "Content-Type: application/json" \
+  -d '{"filename":"photo.jpg","fileType":"image/jpeg"}'
+```
+
+Response (example):
+
+```json
+{
+  "success": true,
+  "uploadURL": "https://...", 
+  "key": "uuid-photo.jpg"
+}
+```
+
+Client-side upload (use PUT to the returned `uploadURL`):
+
+```js
+await fetch(uploadURL, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+```
+
+After upload, store metadata in DB:
+
+```bash
+curl -X POST http://localhost:3000/api/files \
+  -H "Content-Type: application/json" \
+  -d '{"fileName":"photo.jpg","fileURL":"https://...","size":12345,"uploaderId":1}'
+```
+
+Notes:
+
+- Keep pre-signed URL expiry short (e.g., 60–120s) and validate file type/size before generating URLs.
+- Ensure your Prisma schema includes a `File` model to persist file records; adapt fields used in `app/api/files/route.ts` accordingly.
+- For Azure Blob, use `@azure/storage-blob` and generate SAS tokens similarly.
+
 
 
 
