@@ -972,6 +972,29 @@ Accessibility & contrast
 
 - Dark mode switches use Tailwind's `dark:` variants to ensure sufficient contrast. Test both themes with contrast tools.
 
+---
+
+## Loading & Error States
+
+To improve perceived performance and resilience, the app includes loading skeletons and route-level error boundaries using the App Router conventions (`loading.tsx` and `error.tsx`).
+
+What I added
+
+- `app/users/loading.tsx` — skeleton UI using `animate-pulse` to show while the `users` route is resolving.
+- `app/users/error.tsx` — client-side error boundary that displays the error message and a **Try Again** button (calls `reset()`).
+- `app/users/[id]/loading.tsx` and `app/users/[id]/error.tsx` — route-specific fallbacks for dynamic user pages.
+
+Testing & simulation
+
+- To see the loading skeleton, you can simulate a slow network in DevTools and navigate to `/users`.
+- To test the error boundary, temporarily throw an error inside the route (e.g., `if (!data) throw new Error('test error')`) and use the **Try Again** button to call `reset()`.
+
+Why this helps
+
+- Skeletons reduce layout shift and give users an expectation of the incoming content structure.
+- Error boundaries provide a controlled recovery path and prevent the whole app from crashing on a route-level failure.
+
+
 
 - Store event logs or use provider webhooks for bounces and delivery notifications.
 
