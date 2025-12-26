@@ -141,6 +141,42 @@ await prisma.$transaction(async (tx) => {
     data: { tokenNo, status: "PENDING", userId, queueId },
   });
   await tx.queue.update({
+
+---
+
+## Form Handling & Validation (React Hook Form + Zod)
+
+This repository contains form examples using `react-hook-form` with `zod` schemas and the `@hookform/resolvers` adapter.
+
+Installation
+
+```bash
+npm install react-hook-form @hookform/resolvers
+```
+
+Key files added
+
+- `components/FormInput.tsx` — small, reusable input component with label, `aria-invalid`, and error display.
+- `app/signup/page.tsx` — Signup form using `useForm` and `zodResolver` for validation.
+- `app/contact/page.tsx` — Contact form that reuses `FormInput` and validates via Zod.
+
+Validation pattern (example)
+
+1. Define a Zod schema for the form fields.
+2. Use `useForm({ resolver: zodResolver(schema) })` to wire the schema into React Hook Form.
+3. Display `formState.errors` under each input and set `aria-invalid` for accessibility.
+
+Accessible & reusable inputs
+
+- `FormInput` reduces duplication and centralizes label/error markup.
+- Ensure labels are present and `aria-invalid` is set when errors exist.
+
+Reflection
+
+- React Hook Form minimizes re-renders and provides a simple API for complex forms.
+- Zod keeps validation declarative and type-safe, improving developer ergonomics.
+- For production, server-side validation should mirror client-side Zod schemas to avoid inconsistencies.
+
     where: { id: queueId },
     data: { currentNo: tokenNo },
   });
