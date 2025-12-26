@@ -471,6 +471,65 @@ Screenshots and behavior proof: capture the following locally and add under `doc
 
 Pro Tip: Great routing design is invisible — users should feel everything connects seamlessly.
 
+---
+
+## Component Architecture Lesson
+
+This project includes a small component-architecture lesson demonstrating a reusable layout with `Header`, `Sidebar`, `LayoutWrapper`, and a sample UI component `Button`.
+
+Folder structure (added):
+
+```
+components/
+ ├── layout/
+ │    ├── Header.tsx
+ │    ├── Sidebar.tsx
+ │    └── LayoutWrapper.tsx
+ ├── ui/
+ │    └── Button.tsx
+ └── index.ts
+styles/
+ └── globals.css
+```
+
+Usage
+
+- `app/layout.tsx` now imports `styles/globals.css` and wraps pages with `LayoutWrapper` so all pages receive the `Header` and `Sidebar` automatically.
+- Import components via the barrel: `import { LayoutWrapper, Button } from "@/components"`.
+
+Example: `components/layout/Header.tsx` (shared header navigation)
+
+```tsx
+"use client";
+import Link from "next/link";
+
+export default function Header() {
+  return (
+    <header className="w-full bg-blue-600 text-white px-6 py-3 flex justify-between items-center">
+      <h1 className="font-semibold text-lg">Abyss Watchers</h1>
+      <nav className="flex gap-4">
+        <Link href="/">Home</Link>
+        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/users">Users</Link>
+      </nav>
+    </header>
+  );
+}
+```
+
+Design notes
+
+- Reusability: `LayoutWrapper` composes `Header` and `Sidebar` so changes propagate across pages.
+- Accessibility: Shared components are good places to standardize ARIA attributes and keyboard handling.
+- Props contract: `Button` demonstrates a simple prop-driven design (`label`, `variant`).
+
+Next steps (suggested)
+
+- Add Storybook for visual testing and component documentation: `npx storybook init`.
+- Add aria labels, focus styles, and keyboard shortcuts for improved accessibility.
+- Replace mock client-side login cookie with server-set httpOnly cookie for production.
+
+
 
 - `POST /api/auth/signup` — create an account (stores hashed password)
 - `POST /api/auth/login` — exchange credentials for a JWT
