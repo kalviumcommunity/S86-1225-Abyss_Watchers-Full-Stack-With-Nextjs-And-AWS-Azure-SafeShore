@@ -35,6 +35,24 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  // Protect page routes: /dashboard and /users (cookie-based JWT)
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/users")) {
+    const token = req.cookies.get("token")?.value;
+
+    if (!token) {
+      const loginUrl = new URL("/login", req.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    try {
+      jwt.verify(token, JWT_SECRET);
+      return NextResponse.next();
+    } catch (e) {
+      const loginUrl = new URL("/login", req.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   return NextResponse.next();
 }
 
