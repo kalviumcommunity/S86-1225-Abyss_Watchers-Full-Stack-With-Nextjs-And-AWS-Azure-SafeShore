@@ -529,6 +529,51 @@ Next steps (suggested)
 - Add aria labels, focus styles, and keyboard shortcuts for improved accessibility.
 - Replace mock client-side login cookie with server-set httpOnly cookie for production.
 
+---
+
+## State Management: Context & Hooks
+
+This project includes a simple state-management lesson using React Context and custom hooks. The key artifacts are:
+
+- `context/AuthContext.tsx` — `AuthProvider` and `useAuthContext` for authentication state.
+- `context/UIContext.tsx` — `UIProvider` and `useUIContext` for theme and sidebar state.
+- `hooks/useAuth.ts` — `useAuth()` custom hook wrapping auth context.
+- `hooks/useUI.ts` — `useUI()` custom hook wrapping UI context.
+
+How to use
+
+1. Providers are applied globally in `app/layout.tsx` so every page and component can access contexts.
+2. Consume with hooks inside client components:
+
+```tsx
+import { useAuth } from "@/hooks/useAuth";
+import { useUI } from "@/hooks/useUI";
+
+function Example() {
+  const { user, login, logout, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useUI();
+  // ...
+}
+```
+
+Design notes
+
+- Context keeps shared state centralized and avoids prop drilling.
+- Custom hooks provide a small, consistent API surface for components.
+- For complex state transitions, consider `useReducer()` inside the provider and expose `dispatch`.
+
+Debug & Performance
+
+- Use React DevTools to inspect provider values.
+- Wrap consumer-heavy components with `React.memo()` and avoid passing new inline objects as props.
+
+Deliverables included
+
+- Working `AuthProvider` and `UIProvider`.
+- `useAuth` and `useUI` hooks.
+- Demo on the home page showing login/logout and theme/sidebar toggles.
+
+
 
 
 - `POST /api/auth/signup` — create an account (stores hashed password)
