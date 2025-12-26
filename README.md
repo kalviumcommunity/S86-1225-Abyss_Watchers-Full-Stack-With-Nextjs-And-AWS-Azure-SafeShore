@@ -401,6 +401,57 @@ This project includes simple `signup` and `login` API endpoints using `bcrypt` f
 
 ---
 
+## Client-side Data Fetching with SWR
+
+This project includes an example of using SWR for client-side data fetching, caching, and optimistic updates.
+
+Installation
+
+```bash
+npm install
+```
+
+SWR is added as a dependency in `package.json` and a small `fetcher` helper is provided at `lib/fetcher.ts`:
+
+```ts
+export const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch data");
+  return res.json();
+};
+```
+
+Usage example
+
+- `app/users/page.tsx` uses `useSWR("/api/users", fetcher)` to fetch and cache the user list.
+- `app/users/AddUser.tsx` demonstrates optimistic updates via `mutate()` and revalidation after creating a user.
+
+Optimistic update pattern (excerpt):
+
+```ts
+mutate(
+  "/api/users",
+  [...(data || []), { id: Date.now(), name, email: "temp@user.com" }],
+  false
+);
+await fetch("/api/users", { method: "POST", ... });
+mutate("/api/users");
+```
+
+Tips
+
+- Use dynamic keys (`userId ? `/api/users/${userId}` : null`) to pause fetching until dependencies are ready.
+- Configure revalidation strategies (`revalidateOnFocus`, `refreshInterval`, `onErrorRetry`) via SWR options.
+- Inspect caching behavior with React DevTools and `useSWRConfig()`.
+
+Reflection
+
+- SWR reduces redundant network requests and keeps the UI responsive while refreshing in the background.
+- Optimistic UI greatly improves perceived performance but requires careful rollback/error handling for production.
+
+
+---
+
 ## Routing Lesson: Page Routing and Dynamic Routes (Next.js App Router)
 
 This repository also contains a small lesson/demo showing how to implement public and protected pages, dynamic routes, and custom 404 handling using the Next.js App Router.
