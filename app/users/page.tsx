@@ -1,19 +1,26 @@
+"use client";
+import useSWR from "swr";
 import Link from "next/link";
+import { fetcher } from "@/lib/fetcher";
+import AddUser from "./AddUser";
 
-export default function UsersList() {
-  // Mock list
-  const users = [1, 2, 3];
+export default function UsersPage() {
+  const { data, error, isLoading } = useSWR("/api/users", fetcher);
+
+  if (error) return <p className="text-red-600">Failed to load users.</p>;
+  if (isLoading) return <p>Loading...</p>;
 
   return (
-    <main className="flex flex-col items-center mt-10">
-      <h1 className="text-2xl font-bold">Users</h1>
-      <ul className="mt-4 space-y-2">
-        {users.map((id) => (
-          <li key={id}>
-            <Link href={`/users/${id}`} className="text-blue-600">User {id}</Link>
+    <main className="p-6">
+      <h1 className="text-2xl font-bold mb-4">User List</h1>
+      <ul className="space-y-2 mb-4">
+        {Array.isArray(data) && data.map((user: any) => (
+          <li key={user.id} className="p-2 border-b border-gray-200">
+            <Link href={`/users/${user.id}`}>{user.name} — {user.email}</Link>
           </li>
         ))}
       </ul>
+      <AddUser />
     </main>
   );
 }
