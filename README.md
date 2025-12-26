@@ -399,6 +399,79 @@ See the schema files for exact rules and examples.
 
 This project includes simple `signup` and `login` API endpoints using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance.
 
+---
+
+## Routing Lesson: Page Routing and Dynamic Routes (Next.js App Router)
+
+This repository also contains a small lesson/demo showing how to implement public and protected pages, dynamic routes, and custom 404 handling using the Next.js App Router.
+
+Route map (implemented under `app/`):
+
+- Public routes: `/` (Home), `/login`
+- Protected routes: `/dashboard`, `/users`, `/users/[id]` (requires a JWT cookie)
+- API protected routes: `/api/admin/*`, `/api/users/*` (header bearer token)
+
+Key files added for the lesson:
+
+- `app/page.tsx` — Home (public)
+- `app/login/page.tsx` — Login page (client): sets a mock `token` cookie and redirects to `/dashboard`
+- `app/dashboard/page.tsx` — Protected dashboard page
+- `app/users/page.tsx` — Users list (links to dynamic profiles)
+- `app/users/[id]/page.tsx` — Dynamic user profile page (e.g., `/users/1`)
+- `app/layout.tsx` — Global layout with navigation
+- `app/not-found.tsx` — Custom 404 page
+- `app/middleware.ts` — Middleware protecting API routes (header token) and pages (`/dashboard` & `/users` via cookie JWT)
+
+Middleware snippet (page protection):
+
+```ts
+// app/middleware.ts (excerpt)
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Protect page routes: /dashboard and /users (cookie-based JWT)
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/users")) {
+    const token = req.cookies.get("token")?.value;
+    if (!token) return NextResponse.redirect(new URL("/login", req.url));
+    try { jwt.verify(token, JWT_SECRET); return NextResponse.next(); } catch { return NextResponse.redirect(new URL("/login", req.url)); }
+  }
+}
+```
+
+Try it locally:
+
+1. Start the dev server:
+
+```bash
+npm install
+npm run dev
+```
+
+2. Visit `/` and `/login`. Click "Login" to set a mock cookie and be redirected to `/dashboard`.
+3. Visit `/users/1`, `/users/2` to see dynamic user pages.
+
+Reflection
+
+- Dynamic routing makes it easy to scale content pages (e.g., `/users/[id]`) and improves SEO when server-rendered or statically generated.
+- Breadcrumbs and clear path structure help users and search engines understand content hierarchy.
+- Middleware offers a central place to protect both API and page routes; for highly-sensitive pages, prefer httpOnly, Secure cookies set by the server rather than client-side cookies.
+
+Screenshots and behavior proof: capture the following locally and add under `docs/screenshots/` for the lesson:
+
+- Public home and login pages
+- Successful redirect to protected `/dashboard` after login
+- Dynamic pages `/users/1` and `/users/2`
+- Custom 404 page at an unknown path
+
+Pro Tip: Great routing design is invisible — users should feel everything connects seamlessly.
+
+
 - `POST /api/auth/signup` — create an account (stores hashed password)
 - `POST /api/auth/login` — exchange credentials for a JWT
 - `GET /api/users` — example protected route that requires `Authorization: Bearer <token>`
