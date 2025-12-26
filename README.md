@@ -900,6 +900,50 @@ Notes:
 
 - SES requires verified sender emails in sandbox mode; move to production and verify domain for higher throughput.
 - Handle rate limits with background queues for high volume.
+
+---
+
+## Feedback UI: Toasts, Modals, and Loaders
+
+This project includes a small feedback UI system demonstrating:
+
+- Toast notifications via `react-hot-toast` (instant feedback)
+- Accessible modal/dialog for blocking confirmations
+- Spinner/loader for process feedback
+
+Files added
+
+- `components/ui/Modal.tsx` — accessible modal with ESC handling and a simple focus trap
+- `components/ui/Spinner.tsx` — small SVG spinner for async flows
+- `app/feedback/page.tsx` — demo page showing a toast → modal → loader → toast flow
+- `app/layout.tsx` — includes `<Toaster />` from `react-hot-toast`
+
+Example trigger flow (in `app/feedback/page.tsx`):
+
+1. Click **Show Toast** → `toast.loading()` then `toast.success()` after completion.
+2. Click **Open Modal** → accessible modal opens and traps focus.
+3. Confirm → loader shows while async work runs, then `toast.success()` on completion.
+
+Accessibility notes
+
+- Toasts use `aria-live` internally via `react-hot-toast` to announce messages to screen readers.
+- Modal uses `role="dialog"`, `aria-modal="true"`, and traps focus while open. Pressing `Esc` closes it.
+- Spinner markup includes `role="status"` or can be paired with `aria-live` if announcing progress.
+
+How to try it
+
+```bash
+npm install
+npm run dev
+# open http://localhost:3000/feedback
+```
+
+Design reflections
+
+- Use toasts for non-blocking confirmations; avoid using them for critical errors that require user action.
+- Use modals sparingly for destructive or irreversible actions; ensure keyboard and screen-reader access.
+- Show subtle loaders for background work and use blocking loaders only when the user must wait.
+
 - Store event logs or use provider webhooks for bounces and delivery notifications.
 
 
