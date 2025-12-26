@@ -944,6 +944,35 @@ Design reflections
 - Use modals sparingly for destructive or irreversible actions; ensure keyboard and screen-reader access.
 - Show subtle loaders for background work and use blocking loaders only when the user must wait.
 
+---
+
+## Responsive & Themed Design (TailwindCSS)
+
+I added a Tailwind config with custom theme tokens and responsive breakpoints. Key points:
+
+- `tailwind.config.js` includes `darkMode: 'class'`, custom `brand` colors, and `sm|md|lg|xl` breakpoints.
+- `styles/globals.css` now imports Tailwind base/components/utilities.
+- Theme is toggled via the UI context and sets the `dark` class on the document root for dark-mode styles.
+
+Example responsive pattern used in layout:
+
+```html
+<main class="flex-1 bg-white p-4 md:p-6 lg:p-8"> ... </main>
+```
+
+How to try
+
+```bash
+npm install
+npm run dev
+# open the app and resize or use DevTools device toolbar
+```
+
+Accessibility & contrast
+
+- Dark mode switches use Tailwind's `dark:` variants to ensure sufficient contrast. Test both themes with contrast tools.
+
+
 - Store event logs or use provider webhooks for bounces and delivery notifications.
 
 

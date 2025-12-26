@@ -7,7 +7,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <Header />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 bg-white p-6 overflow-auto">{children}</main>
+        <main className="flex-1 bg-white p-4 md:p-6 lg:p-8 overflow-auto">{children}</main>
       </div>
     </div>
   );
