@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { userSchema } from "@/lib/schemas/userSchema";
 import { ZodError } from "zod";
 import jwt from "jsonwebtoken";
+import { hasPermission, logDecision } from "@/lib/rbac";
 import { handleError } from "@/lib/errorHandler";
 import { prisma } from "@/lib/prisma";
 import redis from "@/lib/redis";
@@ -15,7 +16,12 @@ export async function GET(req: Request) {
 
     if (!token) return NextResponse.json({ success: false, message: "Token missing" }, { status: 401 });
 
-    jwt.verify(token, JWT_SECRET);
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+
+    // Permission check: list users requires 'read'
+    const allowed = hasPermission(decoded.role, "read");
+    logDecision(decoded.role, "users", "read", allowed);
+    if (!allowed) return NextResponse.json({ success: false, message: "Access denied: insufficient permissions." }, { status: 403 });
 
     const cacheKey = "users:list";
     const cached = await redis.get(cacheKey);
@@ -37,6 +43,16 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const data = userSchema.parse(body);
+
+    // Verify token and permissions for creation
+    const authHeader = req.headers.get("authorization");
+    const token2 = authHeader?.split(" ")[1];
+    if (!token2) return NextResponse.json({ success: false, message: "Token missing" }, { status: 401 });
+
+    const decoded2: any = jwt.verify(token2, JWT_SECRET);
+    const createAllowed = hasPermission(decoded2.role, "create");
+    logDecision(decoded2.role, "users", "create", createAllowed);
+    if (!createAllowed) return NextResponse.json({ success: false, message: "Access denied: insufficient permissions." }, { status: 403 });
 
     const created = await prisma.user.create({ data });
 

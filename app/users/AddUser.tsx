@@ -2,10 +2,15 @@
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "@/lib/fetcher";
+import { useAuth } from "@/hooks/useAuth";
+import { hasPermission } from "@/lib/rbac";
 
 export default function AddUser() {
   const { data } = useSWR("/api/users", fetcher);
   const [name, setName] = useState("");
+  const { role } = useAuth();
+
+  const canCreate = hasPermission(role, "create");
 
   const addUser = async () => {
     if (!name) return;
@@ -32,6 +37,10 @@ export default function AddUser() {
     mutate("/api/users");
     setName("");
   };
+
+  if (!canCreate) {
+    return <p className="text-sm text-gray-600 mt-4">You do not have permission to add users.</p>;
+  }
 
   return (
     <div className="mt-4">
