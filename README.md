@@ -1106,6 +1106,52 @@ The script prints `DB CHECK OK` on success, or an error message if it cannot con
 
 If you'd like, I can add a small `next.config.js` snippet to show setting headers at build-time, or create a short PowerShell script that runs the same DB-check on Windows.
 
+## Object Storage Configuration (S3 / Azure Blob)
+
+This project supports presigned uploads to AWS S3 out of the box via `app/api/upload/route.ts` and includes a small client component at `components/UploadForm.tsx` that demonstrates requesting an upload URL and uploading directly from the browser.
+
+Quick checklist
+
+- Create a private bucket/container (S3 bucket or Azure Blob container). Block public access.
+- Create an IAM user (AWS) with minimal S3 permissions or generate a SAS token (Azure) with limited expiry.
+- Store credentials in environment variables (see example below).
+
+Environment variables (example `.env.local`):
+
+```
+AWS_REGION=us-east-1
+AWS_BUCKET_NAME=kalvium-app-storage
+AWS_ACCESS_KEY_ID=YOUR_KEY
+AWS_SECRET_ACCESS_KEY=YOUR_SECRET
+ALLOWED_ORIGIN=https://your-frontend.example.com
+```
+
+S3 presigned upload flow (server)
+
+1. Client POSTs `{ filename, fileType }` to `/api/upload`.
+2. Server validates file type/size and returns a presigned `PUT` URL.
+3. Client performs a `PUT` to the presigned URL with the file bytes.
+
+Client example
+
+Use the `components/UploadForm.tsx` component to try uploads locally. It performs basic client-side validation, requests the upload URL, and uploads the file directly to S3.
+
+Azure Blob (SAS) notes
+
+- If you prefer Azure Blob, generate a SAS token on the server using `@azure/storage-blob` and return a SAS URL to the client. Example permissions: `sp=rw&se=...` for write access with short expiry.
+- Keep the storage account keys private; prefer SAS tokens or managed identities for production.
+
+Validation & lifecycle
+
+- Validate MIME type and size on both client and server. The existing `/api/upload` validates basic types.
+- Consider lifecycle rules (auto-archive or delete after X days) for temporary uploads and thumbnails.
+
+Testing
+
+1. Ensure AWS env vars are set and the bucket exists.
+2. Import `components/UploadForm.tsx` into a page and try uploading.
+3. Verify the object appears in the S3 console and that the returned `key` matches.
+
 
 
 
