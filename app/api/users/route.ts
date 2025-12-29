@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { hasPermission, logDecision } from "@/lib/rbac";
 import { handleError } from "@/lib/errorHandler";
 import { prisma } from "@/lib/prisma";
+import { sanitizeObjectStrings } from "@/lib/sanitize";
 import redis from "@/lib/redis";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -54,7 +55,8 @@ export async function POST(req: Request) {
     logDecision(decoded2.role, "users", "create", createAllowed);
     if (!createAllowed) return NextResponse.json({ success: false, message: "Access denied: insufficient permissions." }, { status: 403 });
 
-    const created = await prisma.user.create({ data });
+    const sanitizedData = sanitizeObjectStrings(data);
+    const created = await prisma.user.create({ data: sanitizedData });
 
     // Invalidate users list cache
     await redis.del("users:list");

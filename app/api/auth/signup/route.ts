@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { handleError } from "@/lib/errorHandler";
 import redis from "@/lib/redis";
+import { sanitizeInput } from "@/lib/sanitize";
 
 export async function POST(req: Request) {
   try {
@@ -12,6 +13,8 @@ export async function POST(req: Request) {
     if (!name || !email || !password) {
       return NextResponse.json({ success: false, message: "Missing fields" }, { status: 400 });
     }
+    const cleanName = sanitizeInput(name);
+    const cleanEmail = sanitizeInput(email);
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -20,7 +23,7 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({ data: { name, email, password: hashedPassword } });
+    const newUser = await prisma.user.create({ data: { name: cleanName, email: cleanEmail, password: hashedPassword } });
 
     // Invalidate users list cache
     try {
