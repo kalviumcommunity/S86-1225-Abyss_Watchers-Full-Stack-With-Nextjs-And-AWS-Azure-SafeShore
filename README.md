@@ -1156,5 +1156,60 @@ Testing
 
 
 
+## Environment Setup on Cloud (Secrets Manager / Key Vault)
+
+Store production secrets securely using AWS Secrets Manager or Azure Key Vault instead of committing `.env` files.
+
+Quick steps (AWS Secrets Manager)
+
+1. In AWS Console → Secrets Manager → Store a new secret → choose "Other type of secret" and paste key/value pairs from your `.env.local` (e.g., `DATABASE_URL`, `JWT_SECRET`).
+2. Note the Secret ARN and grant a least-privilege IAM role permission to call `secretsmanager:GetSecretValue` for that ARN.
+
+Example IAM policy (read-only for the secret):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": ["secretsmanager:GetSecretValue"],
+    "Resource": ["arn:aws:secretsmanager:region:account-id:secret:nextjs/app-secrets-*"]
+  }]
+}
+```
+
+Quick steps (Azure Key Vault)
+
+1. Create a Key Vault in Azure Portal and add secrets under Secrets → + Generate/Import.
+2. Assign a Managed Identity or service principal to your App Service / Function and grant `get` permission on secrets.
+
+Runtime retrieval
+
+This repo includes `lib/secrets.ts` with helpers for both providers:
+
+- `getSecretsAWS(secretId?)` — reads a JSON secret from Secrets Manager (uses `SECRET_ARN` or passed ARN).
+- `getSecretAzure(vaultName?, secretName?)` — retrieves a single secret value from Key Vault.
+
+Example (server-side API route):
+
+```ts
+import { getSecretsAWS } from '@/lib/secrets';
+
+export async function GET() {
+  const secrets = await getSecretsAWS();
+  return new Response(JSON.stringify({ ok: true, keys: Object.keys(secrets) }));
+}
+```
+
+Notes & best practices
+
+- Use platform-native injection (ECS task secrets, App Service settings) when possible so secrets are not in process env files.
+- Rotate secrets periodically and use Secrets Manager auto-rotation where supported.
+- Store only non-sensitive build-time values in `.env`; keep production secrets in the vault.
+
+
+
+
+
 
 
