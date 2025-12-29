@@ -7,13 +7,35 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  const setSecurityHeaders = (res: NextResponse, isApi = false) => {
+    const HSTS = "max-age=63072000; includeSubDomains; preload";
+    const CSP = "default-src 'self'; img-src 'self' data:; script-src 'self' https:; style-src 'self' 'unsafe-inline';";
+    const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
+
+    res.headers.set("Strict-Transport-Security", HSTS);
+    res.headers.set("Content-Security-Policy", CSP);
+    res.headers.set("X-Content-Type-Options", "nosniff");
+    res.headers.set("X-Frame-Options", "DENY");
+    res.headers.set("Referrer-Policy", "no-referrer");
+    res.headers.set("Permissions-Policy", "geolocation=()");
+
+    if (isApi) {
+      res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
+      res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+      res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    }
+
+    return res;
+  };
+
   // Protect admin and users API routes
   if (pathname.startsWith("/api/admin") || pathname.startsWith("/api/users")) {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
 
     if (!token) {
-      return NextResponse.json({ success: false, message: "Token missing" }, { status: 401 });
+      const res = NextResponse.json({ success: false, message: "Token missing" }, { status: 401 });
+      return setSecurityHeaders(res, true);
     }
 
     try {
@@ -29,9 +51,11 @@ export function middleware(req: NextRequest) {
       if (decoded.email) requestHeaders.set("x-user-email", decoded.email);
       if (decoded.role) requestHeaders.set("x-user-role", decoded.role);
 
-      return NextResponse.next({ request: { headers: requestHeaders } });
+      const res = NextResponse.next({ request: { headers: requestHeaders } });
+      return setSecurityHeaders(res, true);
     } catch (e) {
-      return NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 403 });
+      const res = NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 403 });
+      return setSecurityHeaders(res, true);
     }
   }
 
@@ -41,21 +65,25 @@ export function middleware(req: NextRequest) {
 
     if (!token) {
       const loginUrl = new URL("/login", req.url);
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      return setSecurityHeaders(res, false);
     }
 
     try {
       jwt.verify(token, JWT_SECRET);
-      return NextResponse.next();
+      const res = NextResponse.next();
+      return setSecurityHeaders(res, false);
     } catch (e) {
       const loginUrl = new URL("/login", req.url);
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      return setSecurityHeaders(res, false);
     }
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  return setSecurityHeaders(res, false);
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/api/users/:path*"],
+  matcher: ["/:path*"],
 };
