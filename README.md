@@ -732,6 +732,33 @@ Notes & design decisions:
 - The middleware sets request headers for downstream access — you can also attach a request-scoped context/store if preferred.
 - To add more roles, extend the role checks in `app/middleware.ts` or centralize permission rules in a small RBAC module.
 
+### Roles & Permissions
+
+This project ships a small RBAC helper at `lib/rbac.ts` with a default mapping:
+
+| Role | Permissions |
+| --- | --- |
+| ADMIN | create, read, update, delete |
+| STAFF | read, update |
+| PATIENT | read |
+
+Example policy evaluation (server-side):
+
+```ts
+// lib/rbac.ts
+hasPermission('STAFF', 'create') // => false
+hasPermission('ADMIN', 'delete') // => true
+```
+
+Audit logs are emitted for every allow/deny decision using `lib/logger.ts`. Example log entries:
+
+```json
+{"level":"info","message":"[RBAC] STAFF attempted to create users: DENIED","meta":{"role":"STAFF","resource":"users","action":"create","allowed":false},"timestamp":"..."}
+{"level":"info","message":"[RBAC] ADMIN attempted to read users: ALLOWED","meta":{"role":"ADMIN","resource":"users","action":"read","allowed":true},"timestamp":"..."}
+```
+
+These logs help with auditing and debugging how authorization decisions are made.
+
 ## Centralized Error Handling
 
 We added `lib/logger.ts` and `lib/errorHandler.ts` to provide structured logging and consistent, safe error responses.
