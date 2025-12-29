@@ -1055,6 +1055,57 @@ Local testing:
 
 For Next.js deployments that support `next.config.js` headers, you can alternatively set headers there. When running behind a CDN or proxy, prefer configuring HSTS and CSP at the edge (CDN) or load balancer.
 
+## Cloud Database Configuration (RDS / Azure SQL)
+
+This project uses Prisma and can connect to a managed PostgreSQL instance (AWS RDS or Azure Database for PostgreSQL). The following steps outline provisioning, connectivity, and local testing guidance.
+
+1) Provision a managed PostgreSQL instance
+
+- AWS RDS: Create a PostgreSQL DB instance (`nextjs-db`) in RDS console. For testing you may temporarily enable public access and add your IP to the security group inbound rules for port `5432`.
+- Azure Database for PostgreSQL: Create a Single Server, set admin credentials, and add your client IP in the Firewall rules.
+
+2) Set your connection string locally
+
+Create a `.env.local` at the project root containing:
+
+DATABASE_URL="postgresql://admin:YourStrongPassword@your-db-endpoint:5432/nextjsdb"
+
+Replace `admin`, `YourStrongPassword`, `your-db-endpoint`, and database name as appropriate.
+
+3) Generate Prisma client and run migrations (local dev)
+
+Install dependencies and run:
+
+```bash
+npx prisma generate
+npx prisma migrate deploy # or `npx prisma migrate dev` for local development
+```
+
+4) Quick connectivity test (local)
+
+We added a lightweight DB check script to verify connectivity using the generated Prisma client:
+
+```bash
+# from project root
+node scripts/db-check.cjs
+```
+
+The script prints `DB CHECK OK` on success, or an error message if it cannot connect.
+
+5) Best practices for production
+
+- Do NOT enable public access in production; use private subnets, VPC peering, or private endpoints.
+- Use IAM / managed identities or secrets managers where possible (AWS Secrets Manager, Azure Key Vault) to store DB credentials.
+- Enable automated backups (RDS snapshot retention) and configure point-in-time recovery windows.
+- Configure read replicas for scale and a failover strategy for high availability.
+
+6) Troubleshooting
+
+- If `prisma generate` fails, ensure `@prisma/client` is installed and Prisma CLI matches the schema version.
+- If the DB check fails, confirm `DATABASE_URL` is reachable from your network and the DB security group/firewall allows your IP.
+
+If you'd like, I can add a small `next.config.js` snippet to show setting headers at build-time, or create a short PowerShell script that runs the same DB-check on Windows.
+
 
 
 
