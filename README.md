@@ -1028,5 +1028,19 @@ Why this helps
 
 
 
+## Input Sanitization & OWASP Compliance
+
+This project includes server-side sanitization utilities to reduce XSS and SQL injection risks.
+
+- **Utility:** `lib/sanitize.ts` (uses `sanitize-html`) provides `sanitizeInput()` and `sanitizeObjectStrings()` which strip HTML from user-provided strings.
+- **API updates:** Selected API endpoints sanitize string inputs before persistence: `app/api/auth/signup/route.ts`, `app/api/users/route.ts`, and `app/api/appointments/route.ts`.
+- **Validation + Sanitization:** Zod schemas still perform structural validation; sanitization ensures strings do not contain embedded HTML or scripts.
+- **Next steps:** Add CSP headers and secure headers middleware, apply stricter output encoding for any use of `dangerouslySetInnerHTML`, and add security tests to CI.
+
+Follow OWASP guidance: validate, sanitize, and encode — never trust client input.
+
+
+
+
 
 
