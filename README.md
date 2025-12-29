@@ -1039,6 +1039,23 @@ This project includes server-side sanitization utilities to reduce XSS and SQL i
 
 Follow OWASP guidance: validate, sanitize, and encode — never trust client input.
 
+## HTTPS Enforcement & Secure Headers
+
+This project adds middleware to enforce secure communication and set essential security headers. Key configuration lives in `app/middleware.ts`.
+
+- **HSTS:** `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` — forces browsers to use HTTPS.
+- **CSP:** `Content-Security-Policy` set to a conservative default: `default-src 'self'; img-src 'self' data:; script-src 'self' https:; style-src 'self' 'unsafe-inline';` — adjust to allow trusted CDNs and analytics as needed.
+- **CORS:** For API routes, `Access-Control-Allow-Origin` is set from `ALLOWED_ORIGIN` (defaults to `http://localhost:3000`). Avoid `*` in production.
+- **Other headers:** `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy` restricted.
+
+Local testing:
+
+1. Ensure `ALLOWED_ORIGIN` is set in your environment when testing cross-origin requests.
+2. Start the dev server and inspect response headers in DevTools → Network.
+
+For Next.js deployments that support `next.config.js` headers, you can alternatively set headers there. When running behind a CDN or proxy, prefer configuring HSTS and CSP at the edge (CDN) or load balancer.
+
+
 
 
 
