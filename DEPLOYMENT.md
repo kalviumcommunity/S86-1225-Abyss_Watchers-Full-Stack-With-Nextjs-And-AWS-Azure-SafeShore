@@ -111,3 +111,65 @@ If you want, I can:
 - Create a GitHub Action step that registers an ECS task definition with an explicit image name (for immutable deployment tags)
 
 -- End of deployment guide
+ 
+10) Domain & SSL (Route 53 / Azure DNS)
+
+Overview
+
+- Choose one provider (AWS or Azure) depending on where you host your app. Use your domain registrar to point nameservers to Route 53 or Azure DNS.
+
+DNS setup (Route 53)
+
+1. Create a Hosted Zone in Route 53 for `yourdomain.com`.
+2. Copy the NS records and update nameservers at your domain registrar.
+3. Add an A (Alias) record pointing to your load balancer (ALB / NLB) or the App Service IP/DNS.
+  - Name: `yourdomain.com`
+  - Type: `A` (Alias) → select the load balancer DNS
+4. (Optional) Add a CNAME for `www` pointing to the root domain.
+
+DNS setup (Azure DNS)
+
+1. Create a DNS Zone in Azure for `yourdomain.com`.
+2. Update your registrar to use the Azure-provided NS records.
+3. Add an A record pointing to your App Service's IP, or a CNAME for `www` to yourapp.azurewebsites.net.
+
+Requesting SSL
+
+AWS (ACM)
+
+1. Open AWS Certificate Manager → Request a certificate → Public certificate.
+2. Enter `yourdomain.com` and `*.yourdomain.com` (if you want wildcard).
+3. Choose DNS validation — ACM will give you a CNAME record.
+4. Add the validation CNAME into Route 53 (ACM can auto-add when same account).
+5. Wait until status is `Issued`. Attach the certificate to your Load Balancer or CloudFront distribution.
+
+Azure (App Service Certificate / Managed Certificate)
+
+1. In App Service, go to TLS/SSL settings → Private Key Certificates (.pfx) or create a Managed Certificate.
+2. Verify ownership by validating DNS records or via the App Service process.
+3. Bind the certificate to your custom domain under TLS/SSL bindings.
+
+Enforce HTTPS
+
+- On AWS: configure ALB listener rule to redirect port 80 → 443.
+- On Azure App Service: toggle `HTTPS Only` to ON.
+- In-app: for extra protection (and behind proxies), middleware now redirects HTTP → HTTPS using `x-forwarded-proto` or `x-arr-ssl`.
+
+Verification
+
+- Visit https://yourdomain.com and confirm the padlock (🔒).
+- Inspect DevTools → Security to confirm a valid certificate.
+- Run https://www.ssllabs.com/ssltest/ for a full grade and recommended improvements.
+
+Notes & reflections
+
+- Use DNS validation where possible to automate renewals (ACM auto-renews public certs).
+- Keep separate subdomains for environments (staging, prod) and separate certificates if necessary.
+- For global CDN (CloudFront / Azure CDN) put TLS termination at the CDN and enable HTTP->HTTPS redirect there for best performance.
+
+Add screenshots to `docs/screenshots/` showing:
+- Route 53 / Azure DNS record set
+- ACM / App Service certificate status
+- Browser padlock for the live site
+
+-- End Domain & SSL section
