@@ -7,6 +7,16 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Enforce HTTPS when behind proxies/load balancers that set x-forwarded-proto
+  const forwardedProto = req.headers.get("x-forwarded-proto") || req.headers.get("x-forwarded-protocol");
+  const arrSsl = req.headers.get("x-arr-ssl");
+  const isHttp = forwardedProto === "http" || (!forwardedProto && !arrSsl && req.nextUrl.protocol === "http:");
+  if (isHttp) {
+    const url = new URL(req.url);
+    url.protocol = "https:";
+    return NextResponse.redirect(url);
+  }
+
   const setSecurityHeaders = (res: NextResponse, isApi = false) => {
     const HSTS = "max-age=63072000; includeSubDomains; preload";
     const CSP = "default-src 'self'; img-src 'self' data:; script-src 'self' https:; style-src 'self' 'unsafe-inline';";
