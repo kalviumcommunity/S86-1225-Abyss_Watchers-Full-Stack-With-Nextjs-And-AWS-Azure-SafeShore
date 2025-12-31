@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
+import { logger } from "../lib/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Correlation/request id: reuse incoming or generate a new one
+  const incomingRequestId = req.headers.get("x-request-id");
+  const requestId =
+    incomingRequestId || (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+
+  // Log the incoming request (structured)
+  try {
+    logger.info("incoming_request", { requestId, method: req.method, pathname });
+  } catch (e) {
+    // ignore logging errors in middleware
+  }
 
   // Enforce HTTPS when behind proxies/load balancers that set x-forwarded-proto
   const forwardedProto = req.headers.get("x-forwarded-proto") || req.headers.get("x-forwarded-protocol");
@@ -14,7 +27,9 @@ export function middleware(req: NextRequest) {
   if (isHttp) {
     const url = new URL(req.url);
     url.protocol = "https:";
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    res.headers.set("x-request-id", requestId);
+    return res;
   }
 
   const setSecurityHeaders = (res: NextResponse, isApi = false) => {
@@ -28,6 +43,9 @@ export function middleware(req: NextRequest) {
     res.headers.set("X-Frame-Options", "DENY");
     res.headers.set("Referrer-Policy", "no-referrer");
     res.headers.set("Permissions-Policy", "geolocation=()");
+
+    // attach request id for correlation
+    res.headers.set("x-request-id", requestId);
 
     if (isApi) {
       res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
