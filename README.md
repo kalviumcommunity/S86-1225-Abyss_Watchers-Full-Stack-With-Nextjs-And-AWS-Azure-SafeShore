@@ -398,6 +398,34 @@ npm run test:coverage
 Notes:
 - The Jest config collects coverage from project files and enforces a global 80% threshold. Adjust `jest.config.js` as needed.
 - CI will fail if coverage thresholds are not met.
+ 
+---
+
+## Docker Build & Push Automation
+
+The CI workflow includes an optional `docker-build-push` job that builds a Docker image with Buildx and pushes it to GitHub Container Registry (GHCR). The job runs after successful builds and is skipped for pull requests to avoid publishing from forks.
+
+Key points:
+- Uses `docker/setup-buildx-action` and `docker/build-push-action` for cross-platform builds and caching.
+- Pushes images to GHCR as `ghcr.io/<owner>/<repo>:<sha>` and `:latest`.
+- Caching is enabled via GitHub Actions cache (`type=gha`).
+
+Required repository secrets (for GHCR push using `GITHUB_TOKEN`, no extra secret is strictly required; for Docker Hub, add the corresponding `DOCKER_USERNAME` and `DOCKER_PASSWORD` secrets):
+
+- `GITHUB_TOKEN` (automatically provided in Actions) — used to authenticate to `ghcr.io` when pushing images.
+- `DOCKER_USERNAME` and `DOCKER_PASSWORD` (if you prefer Docker Hub instead of GHCR).
+
+How to run locally (build image):
+
+```bash
+# build locally
+docker build -t your-image:local .
+
+# tag and push to GHCR (example)
+docker tag your-image:local ghcr.io/<owner>/<repo>:local
+docker push ghcr.io/<owner>/<repo>:local
+```
+
 
 ---
 
