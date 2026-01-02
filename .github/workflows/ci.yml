@@ -1,19 +1,55 @@
-name: CI
+name: CI Pipeline
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch: {}
 
 jobs:
-  test:
+  build-test:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
-      - name: Run tests with coverage
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Unit Tests
         run: npm test -- --coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: Deploy (placeholder)
+        if: github.ref == 'refs/heads/main'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          echo "Deploy step placeholder — configure real deploy commands here"
+          # Example (uncomment and configure for S3):
+          # aws s3 sync .next/out s3://$S3_BUCKET --delete --region $AWS_REGION
