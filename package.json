@@ -11,7 +11,9 @@
     "transaction:demo": "node scripts/transaction-demo.cjs",
     "api:test": "bash scripts/api-tests.sh",
     "api:test:ps1": "powershell -ExecutionPolicy ByPass -File ./scripts/api-tests.ps1",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
