@@ -369,6 +369,37 @@ curl -s -X PUT http://localhost:3000/api/users/1 -H "Content-Type: application/j
 - `scripts/api-tests.ps1` — PowerShell test script.
 - `postman/ApiRoutes.postman_collection.json` — Postman collection to import.
 
+---
+
+## Testing (Jest + React Testing Library)
+
+This project includes a starter Jest configuration and sample tests to validate logic and components.
+
+- Files added:
+  - `jest.config.js` — Jest configuration (Next.js aware via `next/jest`).
+  - `jest.setup.js` — Testing Library matchers setup.
+  - `__tests__/math.test.ts` — Sample unit test for `lib/math.ts`.
+  - `__tests__/Button.test.tsx` — Sample component test for `components/ui/Button.tsx`.
+  - `.github/workflows/ci.yml` — CI job runs tests and coverage on push/PR.
+
+Getting started locally:
+
+```bash
+npm install --save-dev jest @testing-library/react @testing-library/jest-dom @testing-library/user-event ts-jest @types/jest
+npm test
+```
+
+- Run coverage report:
+
+```bash
+npm run test:coverage
+```
+
+Notes:
+- The Jest config collects coverage from project files and enforces a global 80% threshold. Adjust `jest.config.js` as needed.
+- CI will fail if coverage thresholds are not met.
+
+
 ### Reflection
 
 Consistent, resource-based naming makes endpoints predictable and easier to integrate with. The handlers include pagination and clear error semantics so clients can handle responses uniformly.
