@@ -399,6 +399,43 @@ Notes:
 - The Jest config collects coverage from project files and enforces a global 80% threshold. Adjust `jest.config.js` as needed.
 - CI will fail if coverage thresholds are not met.
 
+---
+
+## CI Pipeline (GitHub Actions)
+
+The repository includes a CI workflow that runs linting, tests, and a production build on pushes and pull requests. See the workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml).
+
+- Stages:
+  - **Checkout**: pulls the repository code.
+  - **Install**: runs `npm ci` to install dependencies.
+  - **Lint**: runs `npm run lint` (ESLint).
+  - **Test**: runs `npm test -- --coverage` and uploads a coverage artifact.
+  - **Build**: runs `npm run build` to verify the Next.js app builds.
+  - **Deploy**: a conditional placeholder runs only on `main` — replace with your provider's deploy steps.
+
+- Workflow triggers: `push` (branches `main`, `develop`), `pull_request` (branches `main`, `develop`), and manual (`workflow_dispatch`).
+
+- Secrets & env:
+  - Add deployment keys or publish profiles in repository Settings → Secrets and Variables → Actions.
+  - Example secrets used in the workflow: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
+
+- Caching & concurrency:
+  - Node/npm caching is enabled via `actions/setup-node` (cache: `npm`).
+  - Concurrency is configured to cancel in-progress jobs for the same ref to avoid overlapping runs.
+
+Running locally (quick checks):
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+If you'd like, I can:
+- Add a real deployment step for AWS S3/CloudFront or Azure Web App
+- Upload a screenshot of a successful workflow run after you push the branch
+
+
 
 ### Reflection
 
